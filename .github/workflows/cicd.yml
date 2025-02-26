@@ -1,0 +1,70 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  ci:
+    name: Continuous Integration
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do Código
+        uses: actions/checkout@v3
+
+      - name: Instalar Dependências
+        run: npm install
+
+      - name: Executar Linter
+        run: npm run lint
+
+      - name: Executar Testes Unitários
+        run: npm test
+
+      - name: Criar Artefato
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifact
+          path: .
+
+      - name: Criar Release no GitHub
+        uses: softprops/action-gh-release@v1
+        with:
+          files: src/*
+          tag_name: v1.0.${{ github.run_number }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy:
+    name: Deployment
+    needs: ci
+    runs-on: ubuntu-latest
+    environment: staging  # Aprovação Manual
+    steps:
+      - name: Baixar Artefato
+        uses: actions/download-artifact@v3
+        with:
+          name: build-artifact
+
+      - name: Simular Deploy
+        run: echo "🚀 Deploy realizado!"
+
+  notify:
+    name: Notificação de Falha
+    needs: [ci, deploy]
+    if: failure()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enviar E-mail
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.EMAIL_USER }}
+          password: ${{ secrets.EMAIL_PASS }}
+          subject: "🚨 CI/CD Falhou!"
+          to: "notificacao@notificacao" #Utilizar email ou Grupo necessário - mas por padrão caso esteja em alguma ORG ou Grupo já será notificado automaticamente por padrão.
+          from: "ci-cd-pipeline@example.com"
+          body: "Falha no pipeline! Verifique os logs."
