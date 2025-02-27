@@ -48,8 +48,12 @@ jobs:
         with:
           name: build-artifact
 
-      - name: Simular Deploy
-        run: echo "🚀 Deploy realizado!"
+      - name: Instalar CLI da Vercel
+        run: npm install -g vercel
+
+      - name: 🚀 Fazer Deploy na Vercel
+        run: vercel --prod --token=${{ secrets.VERCEL_TOKEN }}
+
 
   notify:
     name: Notificação de Falha
