@@ -1,11 +1,8 @@
 const request = require("supertest");
-const { app, server } = require("../src/index");
+const { app } = require("../src/index");
 const path = require("path");
 const fs = require("fs");
 
-afterAll(() => {
-    server.close(); 
-});
 
 test("Deve responder com status 200 e retornar um arquivo de imagem na rota /", async () => {
     const response = await request(app).get("/");
