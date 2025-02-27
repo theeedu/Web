@@ -3,15 +3,21 @@ const path = require("path");
 
 const app = express();
 
-// Servindo imagem na rota "/"
+
+app.use("/img", express.static(path.join(__dirname, "../public/img")));
+
+
 app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "public/img/devops.jpg"));
+    const imagePath = path.join(__dirname, "../public/img/devops.jpg");
+    console.log("Tentando servir a imagem:", imagePath);
+    
+    res.sendFile(imagePath, (err) => {
+        if (err) {
+            console.error("Erro ao enviar a imagem:", err);
+            res.status(404).send("Imagem não encontrada");
+        }
+    });
 });
 
-if (require.main === module) {
-    app.listen(3000, () => {
-        console.log("Servidor rodando na porta 3000");
-    });
-}
 
 module.exports = app;
