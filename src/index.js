@@ -2,15 +2,13 @@ const express = require("express");
 const path = require("path");
 
 const app = express();
-const port = process.env.PORT || 3000;
 
+// Rota para servir a imagem
 app.get("/", (req, res) => {
-    const imagePath = path.join(__dirname, "../assets/img/devops.jpg");
-    res.sendFile(imagePath);
+    res.sendFile(path.join(__dirname, "public/img/devops.jpg"));
 });
 
-const server = app.listen(port, () => {
-    console.log(`Servidor rodando na porta ${port}`);
-});
 
-module.exports = { app, server };
+// Exportando o handler para Vercel (sem `app.listen()`)
+module.exports = app;
+
